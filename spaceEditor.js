@@ -20,8 +20,8 @@ function mmmm(button, setTo) {
 
 // console.log(u);
 
-// let nw = window.open(file("players.html"), "popupWindow", "width=800, height=600, scrollbars=no,resizable=no"); console.log(nw.document)
-let we = window.open(file("wheel.html"), "popupWindow", "width=800, height=600, scrollbars=no,resizable=no"); console.log(nw.document)
+// let nw = window.open(file("players/index.html"), "popupWindow", "width=800, height=600, scrollbars=no,resizable=no"); console.log(nw.document)
+let nw = window.open(file("wheel/index.html"), "popupWindow", "width=800, height=600, scrollbars=no,resizable=no"); console.log(nw.document)
 
 
 window.addEventListener('contextmenu', function (event) {
