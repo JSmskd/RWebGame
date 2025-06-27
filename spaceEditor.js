@@ -1,6 +1,31 @@
 const canvas = document.getElementById("canvas"); const ctx = canvas.getContext("2d");
 let tick = 0
 let moves = 0
+
+//min? 0.009766958990053518
+//ticks before land
+function tbl() {
+    let aba = 0.009522785015302179 * (1 / 0.997) * (1 / 0.997)// * (1 / 0.997)
+    let going = true
+    let put = 100 - 0.05620956675037 - 1.48369074
+        while (going) {
+        if (aba <= 0.01) {
+            aba *= 1 / 0.975
+        } else if (aba <= 20) {
+            aba *= 1 / 0.99
+        } else if (aba <= 40) {
+            aba *= 1 / 0.995
+        } else /*if (aba <= 60)*/ {
+            aba *= 1 / 0.997
+        }
+        put += aba
+        console.log(aba,put)
+         if (aba >= 100) { going = false }
+    }
+    return put
+}
+const mpm = tbl()
+
 let mouse = {
     inCanvas: false,
     x: 0,
@@ -68,7 +93,7 @@ class wee {
     }
     get weightSize() {
         const
-        t = this.total; if (t > 0) { return (2 * Math.PI) * (1 / t) } else { return (0) }
+            t = this.total; if (t > 0) { return (2 * Math.PI) * (1 / t) } else { return (0) }
     }
 
     addSpace(n, w, col, tcol = rgba(0, 0, 0)) {
@@ -105,7 +130,7 @@ function animate() {
         const o = (offset / t * (2 * Math.PI)) + wp
         const l = o + (cur.weight / t * (2 * Math.PI))
         ctx.fillStyle = cur.colour;
-        wheelPart(150, 60, 30, o, l)
+        wheelPart(150, 80, 60, o, l)
 
         offset += cur.weight
     }
@@ -118,7 +143,7 @@ function animate() {
 
     wp += tick * (nowTime / lastTime) / 100
 
-    if (tick > 0) {console.log(tick)}
+    if (tick > 0) { console.log(tick) }
 
     if (tick > 60) {
         tick *= 0.997
@@ -126,8 +151,8 @@ function animate() {
         tick *= 0.995
     } else if (tick > 20) {
         tick *= 0.99
-    // } else if (tick > 0.001) {
-    //     tick *= 0.975
+        // } else if (tick > 0.001) {
+        //     tick *= 0.975
     } else if (tick > 0.01) {
         tick *= 0.975
     } else { tick = 0 }
