@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>replit</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+ <button onclick="wp=0">reset</button>
+  <Button onclick="wp=mpm;tick=100">set</Button>
+  
+	<script src="global.js" async> </script>
+  <script src="wheel.js" defer> </script>
+
+     <canvas id="canvas"></canvas>
+
+<input type="range" min="0" max="1000" onchange="oc()" id="plea">
+     <p id="p"></p>
+
+
+<script>
+    const slider = document.getElementById("plea");
+function oc() {
+    let v = slider.value
+    v = isNaN(v) ? 0 : v
+    v /= 10
+    document.getElementById("p").innerText = `%${v}`
+}
+        
+
+    // Display the initial slider value
+    oc();
+
+    // Update the slider value as the user drags the handle
+    slider.oninput = oc
+
+</script>
+	
+</body>
+
+</html>
