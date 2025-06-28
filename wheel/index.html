@@ -12,6 +12,7 @@
 
  <button onclick="tick=0; wp=0">reset</button>
  <Button onclick="wp=mpm()">rig</Button>
+ <Button onclick="regRoll()">rand</Button>
   <Button onclick="tick=100">roll</Button>
   
 	<script src="/F:global.js" async> </script>
@@ -20,6 +21,8 @@
      <canvas id="canvas"></canvas>
 <button onclick="upd()"> Update UI</button>
 <input type="range" min="0" max="1000" onchange="oc()" id="plea">
+
+<Button onclick="randIt()">rand</Button>
 <div>
   (%<p id="p">NaN</p> of <p id="w">NaN</p> + <p id="o">NaN</p>) / <p id="t">NaN</p> = <p id="wtf">NaN/NaN</p> = <br>
   <p id="turn">NaN</p>tr = <p id="radian">NaN</p> = <p id="degree">NaN</p>°

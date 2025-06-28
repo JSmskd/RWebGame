@@ -88,11 +88,12 @@ let rigData = {
 function mpm() {
     var eq = 0
     if ((rigData.percent == NaN || rigData.weight == NaN || rigData.offset == NaN || w.total == NaN) == false) {
-        eq = rigData.percent * rigData.weight + rigData.offset
+        eq = rigData.percent / 100 * rigData.weight + rigData.offset
+        console.log(eq)
         eq /= w.total
         eq *= 2 * Math.PI
     }
-    eq += 0.6882637137780405
+    eq+= 0.6882637137780405
     eq *= -1
     return eq
 }
@@ -132,8 +133,8 @@ function slected(rt, ro, ri, rw) {
     rigData.weight = rw;
     oc()
 }
+var menu = document.getElementById("space")
 function upd(hard = false) {
-    var menu = document.getElementById("space")
     menu.innerHTML = ""
     const to = w.total
     let off = 0
@@ -155,8 +156,46 @@ function upd(hard = false) {
     // oc()
 }
 
+function randIt () {
+    slider.value = `${Math.trunc(Math.random() * 1000)}`
+}
+function regRoll() {
+    console.log("-----")
+    const r = Math.random() * w.total
+    let o = 0
 
 
+    let i = 0
+    let c = w.spaces[i]
+    var playin = true
+    while (playin) {
+        c = w.spaces[i]
+        o += c.weight
+        i += 1
+        if (r <= o) {
+            i -= 1
+            c = w.spaces[i]
+        o -= w.spaces[i].weight
+        playin = false
+        }
+        console.log(c,r,o,i)
+    }
+        //rigData.percent
+        console.log(r,o)
+        slider.value = `${truncate((r - o) / c .weight * 1000)}`
+            let ch = menu.children
+            console.log(ch)
+            for (let leo = 0; leo < ch.length; leo++) {
+                if (ch[leo].getAttribute("value") === `${i}`) {
+                    ch[leo].setAttribute("selected","")
+                    eval(ch[leo].getAttribute("onclick"))
+                } else {
+                ch[leo].removeAttribute("selected")
+            }
+        }
+// slected(w.total,o,i,c.weight)
+    // tick = 100
+}
 
 
 
