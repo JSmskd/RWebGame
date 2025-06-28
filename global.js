@@ -14,23 +14,48 @@ function JSONRBR (obj) {
     return a
 }
 
-class wheel {
-    constructor(name) {
-    this.name = name;
-    this.spots = []
+function wheelPart(cx, cy, r, sa, ea) {
+
+    ctx.beginPath()
+    ctx.moveTo(cx, cy)
+    ctx.arc(cx, cy, r, sa, ea, false);
+    // ctx.arc(20, 20, 30, 0, 2 * Math.PI);
+    // ctx.fillRect(cx,cy,cx+r,cy+r)
+    ctx.lineTo(cx, cy)
+    ctx.fill(); ctx.stroke()
+    ctx.closePath()
+}
+class wee {
+    constructor(n) {
+        this.name = n
+        this.spaces = []
+    }
+    get total() {
+        let put = 0;
+        for (let i = 0; i < this.spaces.length; i++) {
+            put += this.spaces[i].weight
+
+        };
+        // console.log(this.spaces.length)
+        return put;
+    }
+    get weightSize() {
+        const
+            t = this.total; if (t > 0) { return (2 * Math.PI) * (1 / t) } else { return (0) }
+    }
+
+    addSpace(n, w, col, tcol = rgba(0, 0, 0)) {
+        this.spaces.push({
+            name: n,
+            weight: w,
+            colour: col,
+            textColor: tcol
+        })
     }
 }
 
-class wheelSpot {
-    constructor(name,colour, weight) {
-    this.name = name;
-    this.colour = colour
-    this.modes = {
-        base:weight
-    }
-    }
-    addMode(key, value) {
-        this.modes = JSON.parse(`${JSONRBR(this.modes)},"${key}":${value}}`)
-    }
-}
 
+function truncate(x) {
+    const to = 100
+    return Math.trunc(x * to) / to    
+}

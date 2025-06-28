@@ -2,31 +2,31 @@ const canvas = document.getElementById("canvas"); const ctx = canvas.getContext(
 
 let tick = 0
 let moves = 0
-
+var spinning = true
 //min? 0.009766958990053518
 //ticks before land
-function tbl() {
-    let aba = 0.009522785015302179 * (1 / 0.997) * (1 / 0.997)// * (1 / 0.997)
-    let going = true
-    let put = 100 - 0.05620956675037 - 1.48369074
-        while (going) {
-        if (aba <= 0.01) {
-            aba *= 1 / 0.975
-        } else if (aba <= 20) {
-            aba *= 1 / 0.99
-        } else if (aba <= 40) {
-            aba *= 1 / 0.995
-        } else /*if (aba <= 60)*/ {
-            aba *= 1 / 0.997
-        }
-        put += aba
-        console.log(aba,put)
-         if (aba >= 100) { going = false }
-    }
-    return put
-}
-const mpm = tbl()
-
+// function tbl() {
+//     let aba = 0.009522785015302179 * (1 / 0.997) * (1 / 0.997)// * (1 / 0.997)
+//     let going = true
+//     let put = 100 - 0.05620956675037 - 1.48369074 + 0.10954057280734687
+//         while (going) {
+//         if (aba <= 0.01) {
+//             aba *= 1 / 0.975
+//         } else if (aba <= 20) {
+//             aba *= 1 / 0.99
+//         } else if (aba <= 40) {
+//             aba *= 1 / 0.995
+//         } else /*if (aba <= 60)*/ {
+//             aba *= 1 / 0.997
+//         }
+//         put += aba
+//         // console.log(aba,put)
+//          if (aba >= 100) { going = false }
+//     }
+//     console.log(put)
+//     return put
+// }
+//const mpm = -0.6882637137780405// tbl()
 
 let mouse = {
     inCanvas: false,
@@ -68,52 +68,98 @@ document.addEventListener('mouseup', function (event) {
     mmmm(event.button, false)
 })
 
-function wheelPart(cx, cy, r, sa, ea) {
 
-    ctx.beginPath()
-    ctx.moveTo(cx, cy)
-    ctx.arc(cx, cy, r, sa, ea, false);
-    // ctx.arc(20, 20, 30, 0, 2 * Math.PI);
-    // ctx.fillRect(cx,cy,cx+r,cy+r)
-    ctx.lineTo(cx, cy)
-    ctx.fill(); ctx.stroke()
-    ctx.closePath()
-}
-class wee {
-    constructor(n) {
-        this.name = n
-        this.spaces = []
-    }
-    get total() {
-        let put = 0;
-        for (let i = 0; i < this.spaces.length; i++) {
-            put += this.spaces[i].weight
-
-        };
-        // console.log(this.spaces.length)
-        return put;
-    }
-    get weightSize() {
-        const
-            t = this.total; if (t > 0) { return (2 * Math.PI) * (1 / t) } else { return (0) }
-    }
-
-    addSpace(n, w, col, tcol = rgba(0, 0, 0)) {
-        this.spaces.push({
-            name: n,
-            weight: w,
-            colour: col,
-            textColor: tcol
-        })
-    }
-}
 ///(2 * Math.PI) * (weight  / total)
 
 let w = new wee("Default")
 w.addSpace("good", 1, rgba(0, 255, 0))
 w.addSpace("Bad", 1, rgba(255, 0, 0))
 w.addSpace("SpinAgain", 3, rgba(0, 0, 255))
+
 let wp = 0
+let rigData = {
+    total: NaN, // Total Weight
+    offset: NaN,// how much weight before
+    index: NaN, // what index
+    weight: NaN, // weight
+    percent: NaN
+}
+
+function mpm() {
+    var eq = 0
+    if ((rigData.percent == NaN || rigData.weight == NaN || rigData.offset == NaN || w.total == NaN) == false) {
+        eq = rigData.percent * rigData.weight + rigData.offset
+        eq /= w.total
+        eq *= 2 * Math.PI
+    }
+    eq += 0.6882637137780405
+    eq *= -1
+    return eq
+}
+
+const slider = document.getElementById("plea");
+function oc() {
+    let v = slider.value
+    v = isNaN(v) ? 0 : v
+    v /= 10
+    var equation = v
+    rigData.percent = v
+
+    equation /= 100
+    document.getElementById("p").innerText = `${v}`
+    equation *= rigData.weight
+    document.getElementById("w").innerText = `${rigData.weight}`
+    equation += rigData.offset
+    document.getElementById("o").innerText = `${rigData.offset}`
+    document.getElementById("t").innerText = `${rigData.total}`
+    // console.log(equation)
+
+
+    document.getElementById("wtf").innerText = `${truncate(equation)}/${w.total}`
+    equation /= w.total
+    document.getElementById("turn").innerText = `${truncate(equation)}`
+    document.getElementById("radian").innerText = `${truncate(equation * 2 * Math.PI)}`
+    document.getElementById("degree").innerText = `${truncate(equation * 360)}`
+
+    //°
+}
+oc(); // Display the initial slider value
+slider.oninput = oc// Update the slider value as the user drags the handle
+function slected(rt, ro, ri, rw) {
+    rigData.total = rt;
+    rigData.offset = ro;
+    rigData.index = ri;
+    rigData.weight = rw;
+    oc()
+}
+function upd(hard = false) {
+    var menu = document.getElementById("space")
+    menu.innerHTML = ""
+    const to = w.total
+    let off = 0
+
+    var c = []
+    for (let i = 0; i < w.spaces.length; i++) {
+        // name: n, weight: w, colour: col, textColor: tcol
+
+        var curent = w.spaces[i]
+        var opt = document.createElement("option")
+        opt.value = i
+        opt.innerText = `${curent.name} | ${curent.weight}`
+
+        opt.setAttribute("onclick", `slected(${to}, ${off}, ${i}, ${curent.weight})`)
+        if (i == 0) { slected(to, off, i, curent.weight) }
+        menu.appendChild(opt)
+        off += curent.weight
+    }
+    // oc()
+}
+
+
+
+
+
+
 // console.log(w)
 const t = w.total
 let lastTime = new Date().getTime();
@@ -145,8 +191,9 @@ function animate() {
     const nowTime = new Date().getTime();
 
     wp += tick * (nowTime / lastTime) / 100
-
-    if (tick > 0) { console.log(tick) }
+    wp %= 2 * Math.PI
+    // console.log(wp)
+    // if (tick > 0) { console.log(tick) }
 
     if (tick > 60) {
         tick *= 0.997
@@ -158,7 +205,7 @@ function animate() {
         //     tick *= 0.975
     } else if (tick > 0.01) {
         tick *= 0.975
-    } else { tick = 0 }
+    } else { tick = 0; spinning = false }
     lastTime = nowTime;
     requestAnimationFrame(animate)
 }

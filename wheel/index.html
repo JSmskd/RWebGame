@@ -10,35 +10,22 @@
 
 <body>
 
- <button onclick="wp=0">reset</button>
-  <Button onclick="wp=mpm;tick=100">set</Button>
+ <button onclick="tick=0; wp=0">reset</button>
+ <Button onclick="wp=mpm()">rig</Button>
+  <Button onclick="tick=100">roll</Button>
   
 	<script src="/F:global.js" async> </script>
   <script src="index.js" defer> </script>
 
      <canvas id="canvas"></canvas>
-
+<button onclick="upd()"> Update UI</button>
 <input type="range" min="0" max="1000" onchange="oc()" id="plea">
-     <p id="p"></p>
+<div>
+  (%<p id="p">NaN</p> of <p id="w">NaN</p> + <p id="o">NaN</p>) / <p id="t">NaN</p> = <p id="wtf">NaN/NaN</p> = <br>
+  <p id="turn">NaN</p>tr = <p id="radian">NaN</p> = <p id="degree">NaN</p>°
+</div>
+<select name="space" id="space"></select>
 
-
-<script>
-    const slider = document.getElementById("plea");
-function oc() {
-    let v = slider.value
-    v = isNaN(v) ? 0 : v
-    v /= 10
-    document.getElementById("p").innerText = `%${v}`
-}
-        
-
-    // Display the initial slider value
-    oc();
-
-    // Update the slider value as the user drags the handle
-    slider.oninput = oc
-
-</script>
 	
 </body>
 
