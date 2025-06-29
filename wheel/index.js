@@ -1,33 +1,27 @@
-const canvas = document.getElementById("canvas"); const ctx = canvas.getContext("2d");
+const canvas = document.getElementById("canvas")
+const menu = document.getElementById("space")
+const slider = document.getElementById("plea")
+
+const ctx = canvas.getContext("2d");
 
 let tick = 0
-let moves = 0
-var spinning = true
-//min? 0.009766958990053518
-//ticks before land
-// function tbl() {
-//     let aba = 0.009522785015302179 * (1 / 0.997) * (1 / 0.997)// * (1 / 0.997)
-//     let going = true
-//     let put = 100 - 0.05620956675037 - 1.48369074 + 0.10954057280734687
-//         while (going) {
-//         if (aba <= 0.01) {
-//             aba *= 1 / 0.975
-//         } else if (aba <= 20) {
-//             aba *= 1 / 0.99
-//         } else if (aba <= 40) {
-//             aba *= 1 / 0.995
-//         } else /*if (aba <= 60)*/ {
-//             aba *= 1 / 0.997
-//         }
-//         put += aba
-//         // console.log(aba,put)
-//          if (aba >= 100) { going = false }
-//     }
-//     console.log(put)
-//     return put
-// }
-//const mpm = -0.6882637137780405// tbl()
+let wp = 0
+let slowingDown = true
+let lastTime = new Date().getTime();
 
+let w = new wee("Default")
+w.addSpace("good", 1, rgba(0, 255, 0))
+w.addSpace("Bad", 1, rgba(255, 0, 0))
+w.addSpace("SpinAgain", 3, rgba(0, 0, 255))
+
+
+let rigData = {
+    total: NaN, // Total Weight
+    offset: NaN,// how much weight before
+    index: NaN, // what index
+    weight: NaN, // weight
+    percent: NaN
+}
 let mouse = {
     inCanvas: false,
     x: 0,
@@ -71,34 +65,18 @@ document.addEventListener('mouseup', function (event) {
 
 ///(2 * Math.PI) * (weight  / total)
 
-let w = new wee("Default")
-w.addSpace("good", 1, rgba(0, 255, 0))
-w.addSpace("Bad", 1, rgba(255, 0, 0))
-w.addSpace("SpinAgain", 3, rgba(0, 0, 255))
-
-let wp = 0
-let rigData = {
-    total: NaN, // Total Weight
-    offset: NaN,// how much weight before
-    index: NaN, // what index
-    weight: NaN, // weight
-    percent: NaN
-}
-
 function mpm() {
     var eq = 0
     if ((rigData.percent == NaN || rigData.weight == NaN || rigData.offset == NaN || w.total == NaN) == false) {
         eq = rigData.percent / 100 * rigData.weight + rigData.offset
-        console.log(eq)
         eq /= w.total
         eq *= 2 * Math.PI
     }
-    eq+= 0.6882637137780405
+    eq += 0.6882637137780405
     eq *= -1
     return eq
 }
 
-const slider = document.getElementById("plea");
 function oc() {
     let v = slider.value
     v = isNaN(v) ? 0 : v
@@ -113,7 +91,6 @@ function oc() {
     equation += rigData.offset
     document.getElementById("o").innerText = `${rigData.offset}`
     document.getElementById("t").innerText = `${rigData.total}`
-    // console.log(equation)
 
 
     document.getElementById("wtf").innerText = `${truncate(equation)}/${w.total}`
@@ -133,7 +110,7 @@ function slected(rt, ro, ri, rw) {
     rigData.weight = rw;
     oc()
 }
-var menu = document.getElementById("space")
+
 function upd(hard = false) {
     menu.innerHTML = ""
     const to = w.total
@@ -153,18 +130,14 @@ function upd(hard = false) {
         menu.appendChild(opt)
         off += curent.weight
     }
-    // oc()
 }
 
-function randIt () {
+function randIt() {
     slider.value = `${Math.trunc(Math.random() * 1000)}`
 }
 function regRoll() {
-    console.log("-----")
     const r = Math.random() * w.total
     let o = 0
-
-
     let i = 0
     let c = w.spaces[i]
     var playin = true
@@ -175,48 +148,33 @@ function regRoll() {
         if (r <= o) {
             i -= 1
             c = w.spaces[i]
-        o -= w.spaces[i].weight
-        playin = false
+            o -= w.spaces[i].weight
+            playin = false
         }
-        console.log(c,r,o,i)
     }
-        //rigData.percent
-        console.log(r,o)
-        slider.value = `${truncate((r - o) / c .weight * 1000)}`
-            let ch = menu.children
-            console.log(ch)
-            for (let leo = 0; leo < ch.length; leo++) {
-                if (ch[leo].getAttribute("value") === `${i}`) {
-                    ch[leo].setAttribute("selected","")
-                    eval(ch[leo].getAttribute("onclick"))
-                } else {
-                ch[leo].removeAttribute("selected")
-            }
+    slider.value = `${truncate((r - o) / c.weight * 1000)}`
+    let ch = menu.children
+    for (let leo = 0; leo < ch.length; leo++) {
+        if (ch[leo].getAttribute("value") === `${i}`) {
+            ch[leo].setAttribute("selected", "")
+            eval(ch[leo].getAttribute("onclick"))
+        } else {
+            ch[leo].removeAttribute("selected")
         }
-// slected(w.total,o,i,c.weight)
-    // tick = 100
+    }
 }
-
-
-
-// console.log(w)
-const t = w.total
-let lastTime = new Date().getTime();
 
 function animate() {
     ctx.fillStyle = rgba(0, 0, 0);
     ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 
     ctx.strokeStyle = rgba(0, 0, 0);
-    // ctx.arc(10,10,20,20,30,false)
     let offset = 0
     const blop = w.weightSize
-    // console.log(offset,t)
-    for (let i = 0; offset < t; i++) {
-        // console.log("ple")
+    for (let i = 0; offset < w.total; i++) {
         const cur = w.spaces[i]
-        const o = (offset / t * (2 * Math.PI)) + wp
-        const l = o + (cur.weight / t * (2 * Math.PI))
+        const o = (offset / w.total * (2 * Math.PI)) + wp
+        const l = o + (cur.weight / w.total * (2 * Math.PI))
         ctx.fillStyle = cur.colour;
         wheelPart(150, 80, 60, o, l)
 
@@ -228,23 +186,32 @@ function animate() {
         ctx.fillRect(mouse.x - 5, mouse.y - 5, 10, 10);
     };
     const nowTime = new Date().getTime();
-
     wp += tick * (nowTime / lastTime) / 100
     wp %= 2 * Math.PI
-    // console.log(wp)
-    // if (tick > 0) { console.log(tick) }
 
-    if (tick > 60) {
-        tick *= 0.997
-    } else if (tick > 40) {
-        tick *= 0.995
-    } else if (tick > 20) {
-        tick *= 0.99
-        // } else if (tick > 0.001) {
-        //     tick *= 0.975
-    } else if (tick > 0.01) {
-        tick *= 0.975
-    } else { tick = 0; spinning = false }
+    //area of ehhhh
+    const aoe = 0.01
+     
+    if (slowingDown) {
+        if (tick > 60) {
+            tick *= 0.997
+        } else if (tick > 40) {
+            tick *= 0.995
+        } else if (tick > 20) {
+            tick *= 0.99
+        } else if (tick > 0.01) {
+            tick *= 0.975
+        } else { tick = 0; spinning = false }
+    } else if (mpm() - aoe < wp) {
+        const r = Math.random()
+        if (r > 0.95) {
+            console.log(`you win ${r}`)
+         wp = mpm()
+         slowingDown = true
+        } else {
+            console.log("errnh")
+        }
+        }
     lastTime = nowTime;
     requestAnimationFrame(animate)
 }

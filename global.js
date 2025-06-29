@@ -4,11 +4,11 @@ function file(name) {
     u.push(name)
     return u.join("/")
 }
-function rgba(r,g,b,a=255) {
+function rgba(r, g, b, a = 255) {
     return `rgba(${r},${g},${b},${a})`
 }
 //JSON Right Bracket Removed
-function JSONRBR (obj) {
+function JSONRBR(obj) {
     var a = JSON.stringify(obj)
     a.pop()
     return a
@@ -57,5 +57,5 @@ class wee {
 
 function truncate(x) {
     const to = 100
-    return Math.trunc(x * to) / to    
+    return Math.trunc(x * to) / to
 }
