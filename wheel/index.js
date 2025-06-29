@@ -169,10 +169,7 @@ function spin() {
     slowingDown = false
 }
 
-function animate() {
-    ctx.fillStyle = rgba(0, 0, 0);
-    ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
-
+function wheelCanv(x,y,r) {
     ctx.strokeStyle = rgba(0, 0, 0);
     let offset = 0
     const blop = w.weightSize
@@ -181,10 +178,34 @@ function animate() {
         const o = (offset / w.total * (2 * Math.PI)) + wp
         const l = o + (cur.weight / w.total * (2 * Math.PI))
         ctx.fillStyle = cur.colour;
-        wheelPart(150, 80, 60, o, l)
+        wheelPart(x, y, r, o, l)
+        
+        const relp = (r * 0.25)
+
+    ctx.fillStyle = rgba(255, 255, 255);
+ctx.beginPath()
+    ctx.moveTo(x + r - (r * 0.27), y)
+    ctx.lineTo(x + r - relp, y + (r * 0.01))
+    // ctx.arc(cx, cy, r, sa, ea, false);
+    // ctx.arc(20, 20, 30, 0, 2 * Math.PI);
+    // ctx.fillRect(cx,cy,cx+r,cy+r)
+    ctx.lineTo(x + relp + r, y + (r * 0.05))
+    ctx.lineTo(x + relp + r, y - (r * 0.05))
+    ctx.lineTo(x + r - relp, y - (r * 0.01))
+    ctx.lineTo(x + r - relp, y + (r * 0.01))
+    ctx.lineTo(x + r - (r * 0.27), y)
+    ctx.fill();// ctx.stroke()
+    ctx.closePath()
 
         offset += cur.weight
     }
+}
+
+function animate() {
+    ctx.fillStyle = rgba(0, 0, 0);
+    ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+
+    wheelCanv(250, 250, 200)
 
     if (mouse.inCanvas) {
         ctx.fillStyle = rgba(255, 255, 255);
