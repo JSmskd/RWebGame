@@ -1,4 +1,4 @@
-function file(name) {
+function file(name:string) {
     var u = `${window.location.href}`.split("/")
     u.pop()
     u.push(name)
@@ -8,9 +8,9 @@ function rgba(r, g, b, a = 255) {
     return `rgba(${r},${g},${b},${a})`
 }
 //JSON Right Bracket Removed
-function JSONRBR(obj) {
+function JSONRBR(obj:object) {
     var a = JSON.stringify(obj)
-    a.pop()
+    a.slice(a.length-1)// pop()
     return a
 }
 
@@ -25,7 +25,16 @@ function wheelPart(cx, cy, r, sa, ea) {
     ctx.fill(); ctx.stroke()
     ctx.closePath()
 }
+class sp {
+    name:string
+weight:number
+colour: string
+textColor: string
+
+}
 class wee {
+    name:string
+    spaces:Array<sp>
     constructor(n) {
         this.name = n
         this.spaces = []
