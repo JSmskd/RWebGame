@@ -10,10 +10,10 @@
 
 <body>
 
-  <button onclick="tick=0; wp=0">reset</button>
+  <button onclick="tick=0; wp=0; slowingDown = true">reset</button>
   <Button onclick="wp=mpm()">rig</Button>
-  <Button onclick="regRoll(); tick = 100">rand</Button>
-  <Button onclick="tick=100; slowingDown = false">roll</Button>
+  <Button onclick="regRoll(); spin()">rand</Button>
+  <Button onclick="spin()">roll</Button>
 
   <script src="/F:global.js" async> </script>
   <script src="index.js" defer> </script>

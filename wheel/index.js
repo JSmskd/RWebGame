@@ -164,6 +164,11 @@ function regRoll() {
     }
 }
 
+function spin() {
+    tick=100
+    slowingDown = false
+}
+
 function animate() {
     ctx.fillStyle = rgba(0, 0, 0);
     ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
