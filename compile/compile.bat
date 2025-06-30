@@ -1,0 +1,1 @@
+npx tsc F:\compile\global.ts

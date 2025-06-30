@@ -38,6 +38,17 @@ function mmmm(button, setTo) {
         default: break;
     }
 }
+function wheelPart(cx, cy, r, sa, ea) {
+
+    ctx.beginPath()
+    ctx.moveTo(cx, cy)
+    ctx.arc(cx, cy, r, sa, ea, false);
+    // ctx.arc(20, 20, 30, 0, 2 * Math.PI);
+    // ctx.fillRect(cx,cy,cx+r,cy+r)
+    ctx.lineTo(cx, cy)
+    ctx.fill(); ctx.stroke()
+    ctx.closePath()
+}
 // function
 
 // console.log(u);
@@ -93,11 +104,11 @@ function oc() {
     document.getElementById("t").innerText = `${rigData.total}`
 
 
-    document.getElementById("wtf").innerText = `${truncate(equation)}/${w.total}`
+    document.getElementById("wtf").innerText = `${JStruncate(equation)}/${w.total}`
     equation /= w.total
-    document.getElementById("turn").innerText = `${truncate(equation)}`
-    document.getElementById("radian").innerText = `${truncate(equation * 2 * Math.PI)}`
-    document.getElementById("degree").innerText = `${truncate(equation * 360)}`
+    document.getElementById("turn").innerText = `${JStruncate(equation)}`
+    document.getElementById("radian").innerText = `${JStruncate(equation * 2 * Math.PI)}`
+    document.getElementById("degree").innerText = `${JStruncate(equation * 360)}`
 
     //°
 }
@@ -152,7 +163,7 @@ function regRoll() {
             playin = false
         }
     }
-    slider.value = `${truncate((r - o) / c.weight * 1000)}`
+    slider.value = `${JStruncate((r - o) / c.weight * 1000)}`
     let ch = menu.children
     for (let leo = 0; leo < ch.length; leo++) {
         if (ch[leo].getAttribute("value") === `${i}`) {

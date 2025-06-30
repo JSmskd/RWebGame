@@ -14,17 +14,7 @@ function JSONRBR(obj:object) {
     return a
 }
 
-function wheelPart(cx, cy, r, sa, ea) {
 
-    ctx.beginPath()
-    ctx.moveTo(cx, cy)
-    ctx.arc(cx, cy, r, sa, ea, false);
-    // ctx.arc(20, 20, 30, 0, 2 * Math.PI);
-    // ctx.fillRect(cx,cy,cx+r,cy+r)
-    ctx.lineTo(cx, cy)
-    ctx.fill(); ctx.stroke()
-    ctx.closePath()
-}
 class sp {
     name:string
 weight:number
@@ -64,7 +54,7 @@ class wee {
 }
 
 
-function truncate(x) {
+function JStruncate(x) {
     const to = 100
     return Math.trunc(x * to) / to
 }
