@@ -1,15 +1,27 @@
 #include <SPI.h>
 #include <Ethernet.h>
-#include <SD.h>
+#include <SdFat.h>
+// #include "sdios.h"
 
+//defines
+#define SPI_SPEED SD_SCK_MHZ(50)
 
+//varibles
+SdFs sd;
 String index = "webpage";
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 IPAddress ip(192, 168, 1, 177);
 EthernetServer server(80);
 
+// Serial streams
+// ArduinoOutStream cout(Serial);
 
-File root;
+// input buffer for line
+char cinBuf[40];
+// ArduinoInStream cin(Serial, cinBuf, sizeof(cinBuf));
+
+// SD card chip select
+int chipSelect;
 void setup() {
   Serial.begin(9600);
   Serial.println("");
@@ -19,28 +31,14 @@ void setup() {
   if (Ethernet.linkStatus() == LinkOFF)
     Serial.println("Ethernet cable is not connected.");
   server.begin();
-  SD.begin(4);
-  root = SD.open("/");
 
-  printDirectory(root, 0);
+  printDirectory();
   // test("webpage/global.css");
   // test("webpage/wheel/index.htm");
   // test("webpage/index.htm");
   // test("README.md");
 }
 
-void test(String lo) {
-  File f = SD.open(lo);
-  if (f) {
-     while (f.available()) {
-        Serial.write(f.read());
-      }
-    Serial.println("lo");
-    f.close();
-  } else {
-    Serial.println("nope");
-  }
-}
 void loop() {
   // put your main code here, to run repeatedly:
   EthernetClient client = server.available();
@@ -94,10 +92,10 @@ void header(EthernetClient client, int status) {
   client.print(status);
   // client.print("HTTP/1.1 200 ERR");
   client.println(" ERR");
-  client.println("Connection: close");  // the connection will be closed after completion of the response
+  client.println("Connection: close");
   client.println("Access-Control-Allow-Origin: *");
   client.println("Vary: Origin");
-  client.println();                     // the separator between HTTP header and body
+  client.println();
 }
 
 //write to client from file
@@ -114,12 +112,13 @@ void writeFile(EthernetClient client, String location, int isIndex) {
     use = index + use;
   }
 
-  if (!SD.begin(4)) {
-    return 500;
+  if (!sd.begin(4, SPI_SPEED)) {
+    // Serial.println("500");
+    // return 500;
   }
   // SD.
-  Serial.println(use);
-  File dataFile = SD.open(use);
+  // Serial.println(use);
+  FsFile dataFile = sd.open(use);
 
   if (dataFile) {
 
@@ -140,41 +139,7 @@ void writeFile(EthernetClient client, String location, int isIndex) {
   // return 200;
 }
 
-void printDirectory(File dir, int numTabs) {
-
-  while (true) {
-
-    File entry = dir.openNextFile();
-
-    if (!entry) {
-
-      // no more files
-
-      break;
-    }
-
-    for (uint8_t i = 0; i < numTabs; i++) {
-
-      Serial.print('\t');
-    }
-
-    Serial.print(entry.name());
-
-    if (entry.isDirectory()) {
-
-      Serial.println("/");
-
-      printDirectory(entry, numTabs + 1);
-
-    } else {
-
-      // files have sizes, directories do not
-
-      Serial.print("\t\t");
-
-      Serial.println(entry.size(), DEC);
-    }
-
-    entry.close();
-  }
+void printDirectory() {
+// Serial.println("Files found (date time size name):");
+  // sd.ls(LS_R | LS_DATE | LS_SIZE);
 }
