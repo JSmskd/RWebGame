@@ -1,27 +1,12 @@
-#include <SPI.h>
-#include <Ethernet.h>
-#include <SdFat.h>
-// #include "sdios.h"
+#include "SERVER.hpp"
+// #include "funcs.cpp"
 
-//defines
-#define SPI_SPEED SD_SCK_MHZ(50)
-
-//varibles
-SdFs sd;
-String index = "webpage";
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 1, 177);
-EthernetServer server(80);
-
-// Serial streams
-// ArduinoOutStream cout(Serial);
-
-// input buffer for line
-char cinBuf[40];
 // ArduinoInStream cin(Serial, cinBuf, sizeof(cinBuf));
 
-// SD card chip select
-int chipSelect;
+
+char cinBuf[40];
+SdFs sd;
+// int chipSelect;
 void setup() {
   Serial.begin(9600);
   Serial.println("");
@@ -97,6 +82,7 @@ void header(EthernetClient client, int status) {
   client.println("Vary: Origin");
   client.println();
 }
+
 
 //write to client from file
 void writeFile(EthernetClient client, String location, int isIndex) {
