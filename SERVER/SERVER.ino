@@ -42,15 +42,23 @@ void loop() {
     }
 
     // read the remaining lines of HTTP request header
+String ct = ""; //Content-Type
     while (client.connected()) {
       if (client.available()) {
         String HTTP_header = client.readStringUntil('\n');  // read the header line of HTTP request
-
+        if (HTTP_header.startsWith("Accept: ")) {
+          ct = HTTP_header.substring(8);
+            ct.replace("\r","");
+            int ffo = ct.indexOf(",");
+            int to = ct.length();
+            if (ffo > 0) {
+              to = ffo;
+            }
+            ct = ct.substring(0,to);
+            // ct = ct.readStringUntil(";");
+        }
         if (HTTP_header.equals("\r"))  // the end of HTTP request
           break;
-
-        //Serial.print("<< ");
-        //Serial.println(HTTP_header);  // print HTTP request to Serial Monitor
       }
     }
 
@@ -62,24 +70,26 @@ void loop() {
       // client.println("Content-Type: text/html");
       // client.println("Connection: close");
       // client.println();    
-      header(client, 200);
+      Serial.println(ct);
+      header(client, 200, ct);
       writeFile(client, HTTP_req.substring(HTTP_req.indexOf("GET  ") + 5, HTTP_req.indexOf(" HTTP")), 0);
 
-      client.flush();
-      client.flush();
-      delay(10);
       client.stop();
     // }
   }
 }
-void header(EthernetClient client, int status) {
+void header(EthernetClient client, int status,String ct) {
   client.print("HTTP/1.1 ");
-  client.print(status);
-  // client.print("HTTP/1.1 200 ERR");
-  client.println(" ERR");
+  String a = retStat(status);
+  Serial.println(a);
+  client.println(a);
   client.println("Connection: close");
   client.println("Access-Control-Allow-Origin: *");
   client.println("Vary: Origin");
+  if (ct != "") {
+    client.print("Content-Type: ");
+    client.println(ct);
+  }
   client.println();
 }
 
@@ -129,3 +139,40 @@ void printDirectory() {
 // Serial.println("Files found (date time size name):");
   // sd.ls(LS_R | LS_DATE | LS_SIZE);
 }
+String retStat(int status) {
+
+  String prefix = String(status) + " ";
+
+  switch(status) {
+
+//////////////// 2XX Success
+    case 200:
+    return prefix + "OK";
+
+//////////////// 3XX rederect
+
+
+//////////////// 4XX  Client Error
+    case 400: //Bad Request
+    return prefix + "Bad Request";
+    
+    case 401: //Unauthorized
+    return prefix + "Unauthorized";
+    
+    case 403: // Forbidden
+    return prefix + "Forbidden";
+    
+    case 404: //Not Found
+    return prefix + "Not Found";
+    
+
+//////////////// 5XX Server Error
+    case 0:
+    return prefix + "ERR";
+
+//////////////// not specified
+    default:
+    return prefix + "ERR";
+  }
+  }
+
