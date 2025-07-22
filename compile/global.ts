@@ -1,4 +1,4 @@
-function file(name:string) {
+function file(name: string) {
     var u = `${window.location.href}`.split("/")
     u.pop()
     u.push(name)
@@ -8,23 +8,23 @@ function rgba(r, g, b, a = 255) {
     return `rgba(${r},${g},${b},${a})`
 }
 //JSON Right Bracket Removed
-function JSONRBR(obj:object) {
+function JSONRBR(obj: object) {
     var a = JSON.stringify(obj)
-    a.slice(a.length-1)// pop()
+    a.slice(a.length - 1)// pop()
     return a
 }
 
 
 class sp {
-    name:string
-weight:number
-colour: string
-textColor: string
+    name: string
+    weight: number
+    colour: string
+    textColor: string
 
 }
 class wee {
-    name:string
-    spaces:Array<sp>
+    name: string
+    spaces: Array<sp>
     constructor(n) {
         this.name = n
         this.spaces = []
@@ -54,7 +54,7 @@ class wee {
 }
 
 
-function JStruncate(x) {
+function JStruncate(x:number) : number {
     const to = 100
-    return Math.trunc(x * to) / to
+    return Math.floor(x * to) / to
 }

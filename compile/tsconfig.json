@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2015", // or a newer version like "esnext"
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
