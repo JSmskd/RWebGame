@@ -1,5 +1,22 @@
-#include "SERVER.hpp"
-// #include "funcs.cpp"
+#include <SdFat.h>
+#include <SPI.h>
+#include <Ethernet.h>
+#define SPI_SPEED SD_SCK_MHZ(50)
+
+// #include "sdios.h"
+
+
+///Root/ INDEX /index.html
+String index = "webpage";
+
+///mac adress to use
+byte mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+
+///ip adress to use   192.168.1.177/index.html
+IPAddress ip(192, 168, 1, 177);
+
+///
+EthernetServer server(80);
 
 // ArduinoInStream cin(Serial, cinBuf, sizeof(cinBuf));
 
@@ -17,7 +34,7 @@ void setup() {
     Serial.println("Ethernet cable is not connected.");
   server.begin();
 
-  printDirectory();
+  // printDirectory();
   // test("webpage/global.css");
   // test("webpage/wheel/index.htm");
   // test("webpage/index.htm");
@@ -54,59 +71,17 @@ void loop() {
 
 
     String fileName = HTTP_req.substring(HTTP_req.indexOf("GET  ") + 5, HTTP_req.indexOf(" HTTP"));
-    header(client, 200, fileName);
-    writeFile(client, fileName, 0);
+    serv(client, fileName);
 
     client.stop();
     // }
   }
 }
 
-//write to client from file
-void writeFile(EthernetClient client, String location, int isIndex) {
-  //0:ok
-  //1:not found
-  //2:no MSDC
-  // char *smthn = strtok(location,".");
-  // Serial.println(smthn);
-
-  // String use = location;
-
-  // if (isIndex == 0) {
-  //   use = index + use;
-  // }
-
-  if (!sd.begin(4, SPI_SPEED)) {
-    // Serial.println("500");
-    // return 500;
-  }
-  // SD.
-  // Serial.println(use);
-  FsFile dataFile = sd.open(index + location);
-
-  if (dataFile) {
-
-    while (dataFile.available()) {
-      client.write(dataFile.read());
-    }
-    dataFile.close();
-  }  // else {
-  //   if (isIndex == -1) {
-  //     if (isIndex == 0) {
-  //       writeFile(client, use + "\\index.html", true);
-  //     }
-  //     // header(400)
-  //     writeFile(client, "404.html", -1);
-  //   // }
-  //   // return 404;
-  // }
-  // return 200;
-}
-
-void printDirectory() {
-  // Serial.println("Files found (date time size name):");
-  // sd.ls(LS_R | LS_DATE | LS_SIZE);
-}
+// void printDirectory() {
+//   // Serial.println("Files found (date time size name):");
+//   // sd.ls(LS_R | LS_DATE | LS_SIZE);
+// }
 String retStat(int status) {
 
   String prefix = String(status) + " ";
@@ -143,54 +118,116 @@ String retStat(int status) {
       return prefix + "ERR";
   }
 }
-void header(EthernetClient client, int status, String fileName) {
+
+void serv(EthernetClient client, String fileName) {
+  if (!sd.begin(4, SPI_SPEED)) {
+    // Serial.println("500");
+    // return 500;
+  }
+  // SD.
+  // Serial.println(use);
+  //sd.open(index + location);
+  String location = fileName;
+  FsFile dataFile = sd.open(index + location);
+
+  Serial.println(fileName);
+  if (dataFile.isFile()) {
+    Serial.println("reg");
+
+  } else {
+    dataFile.close();
+    dataFile = sd.open(index + fileName + "index.html");
+    if (dataFile.isFile()) {
+      Serial.println("ind");
+      location = fileName + "index.html";
+    } else {
+      dataFile.close();
+      dataFile = sd.open(index + fileName + "/index.html");
+      if (dataFile.isFile()) {
+        Serial.println("/ind");
+        location = fileName + "/index.html";
+
+      } else {
+        dataFile.close();
+        Serial.println("ERRRR");
+        location = "/404.html";
+        dataFile = sd.open(index + location);
+      }
+    }
+  }
+
+  //////////////////////////////
+
   client.print("HTTP/1.1 ");
-  char* a = retStat(status).c_str();
-  Serial.println(a);
-  client.println(a);
-  int HEADERS = 6;
+  // char* a = retStat(status).c_str();
+  // Serial.println(a);
+  // client.println(a);
+  int HEADERS = 1;
   char* blank[2] = { "", "" };
   char* Attributes[HEADERS][2] = {
-    { "Connection", "close" }, //0
-    { "Access-Control-Allow-Origin", "*" }, //1
-    { "Vary", "Origin" }, //2
-    { "", "" }, //3
-    {"X-Content-Type-Options", "no-sniff"}, //4
-    {"Cache-Control", "max-age=120"} //5
-    };
+    { "Content-Type", "*/*" },
+    { "Cache-Control", "max-age=120" }
+  };
   int lastDot = fileName.lastIndexOf(".");
-  Serial.println(lastDot);
-  if (lastDot != -1) {
+  // Serial.println(lastDot);
+  if (lastDot != -1 || lastDot < fileName.lastIndexOf("/")) {
     String fileType = fileName.substring(lastDot + 1);
-    char* ct = "*/*";
-    Serial.println(fileType);
+    // Serial.println(fileName.substring(fileName.lastIndexOf("/")));
 
     if (fileType == "ico") {
-      ct = "image/vnd.microsoft.icon";
+      Attributes[0][1] = "image/vnd.microsoft.icon";
+      Attributes[1][1] = "max-age=31556926";
+
+      // } else if (fileType == "webp") {
+      //   Attributes[0][1] = "image/webp";
+
+    } else if (fileType == "svg") {
+      Attributes[0][1] = "image/svg+xml";
+
+
+    } else if (fileType == "html" || fileType == "htm") {
+      Attributes[0][1] = "text/html";
+
     } else if (fileType == "js") {
-      ct = "text/javascript; charset=utf-8";
-    } else if (fileType == "html") {
-      ct = "text/html";
+      Attributes[0][1] = "text/javascript";
+
+      // } else if (fileType == "json") {
+      //   Attributes[0][1] = "application/json";
+
+    } else if (fileType == "css") {
+      Attributes[0][1] = "text/css";
+
+
+      // } else if (fileType == "webmanifest") {
+      //   Attributes[0][1] = "application/manifest+json";
+
+
+    } else if (fileType == "txt") {
+      Attributes[0][1] = "text/plain";
+
+      // } else if (fileType == "md") {
+      //   Attributes[0][1] = "text/markdown";
+      //
+      // } else if (fileType == "") {
+      //   Attributes[0][1] = "";
+
+    } else {
+      Attributes[0][1] = "text/html; charset=utf-8";
     }
-    Attributes[3][0] = "Content-Type";
-    Attributes[3][1] = ct;
-    // Attributes.
   }
+  defHeadder(client);
   for (int i = 0; i < HEADERS; i++) {
-    if (!(Attributes[i][0] == "" || Attributes[i][1] == "")) {
-      client.print(Attributes[i][0]);
-      client.print(": ");
-      // Serial.println(Attributes[i][0]);
-      // Serial.println(Attributes[i][1]);
-      client.println(Attributes[i][1]);
-    } //else {
-    //   Serial.print("X => ");
-    //   Serial.print(Attributes[i][0]);
-    //   Serial.print(": ");
-    //   Serial.println(Attributes[i][1]);
-    // }
+    outputHeadder(client, Attributes[i][0], Attributes[i][1]);
   }
-  client.println();
+  client.println();  //end of headers
+
+  // dataFile = sd.open(index + "/" + location);
+  if (dataFile) {
+    while (dataFile.available())
+      client.write(dataFile.read());
+
+    dataFile.close();
+  }
 }
 
 // String ct = "";  //Content-Type
@@ -212,3 +249,56 @@ void header(EthernetClient client, int status, String fileName) {
 //           break;
 //       }
 //     }
+void defHeadder(EthernetClient client) {
+  outputHeadder(client, "Connection", "close");
+  outputHeadder(client, "Access-Control-Allow-Origin", "*");
+  outputHeadder(client, "Vary", "Origin");
+  outputHeadder(client, "X-Content-Type-Options", "no-sniff");
+  // outputHeadder(client, "Cache-Control", "max-age=120");
+}
+void outputHeadder(EthernetClient client, char* key, char* value) {
+  if (key != "" && value != "") {
+    client.print(key);
+    client.print(": ");
+    client.println(value);
+  }  //else {
+     //   Serial.print("X => ");
+     //   Serial.print(Attributes[i][0]);
+     //   Serial.print(": ");
+     //   Serial.println(Attributes[i][1]);
+     // }
+}
+
+//void listDir(fs::FS& fs, const char* dirname, uint8_t levels) {
+// void listDir(SdFat audio_SD, const char* dirname, uint8_t levels) {
+// Serial.printf("Listing directory: %s\n", dirname);
+
+// 	File root = audio_SD.open(dirname);
+// 	if (!root) {
+// 		Serial.println("Failed to open directory");
+// 		return;
+// 	}
+// 	if (!root.isDirectory()) {
+// 		Serial.println("Not a directory");
+// 		return;
+// 	}
+
+// 	File file = root.openNextFile();
+
+// 	while (file) {
+// 		if (file.isDirectory()) {
+// 			Serial.print("  DIR : ");
+// 			Serial.println(file.name());
+// 			if (levels) {
+// 				listDir(audio_SD, file.name(), levels - 1);
+// 			}
+// 		}
+// 		else {
+// 			Serial.print("  FILE: ");
+// 			Serial.print(file.name());
+// 			Serial.print("  SIZE: ");
+// 			Serial.print(file.size());
+// 		}
+// 		file = root.openNextFile();
+// 	}
+// }
